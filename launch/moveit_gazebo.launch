@@ -1,0 +1,83 @@
+<launch>
+
+  <!-- Debug mode -->
+  <arg name="debug" default="false" />
+
+   <param name="robot_description" command="$(find xacro)/xacro '$(find model_human)/urdf/model_human.xacro'" /> 
+   <rosparam command="load" file="$(find humansinglearm_moveit_config)/config/joint_names.yaml"/> 
+   
+
+  <!-- Launch Gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find humansinglearm_moveit_config)/worlds/empty.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="recording" value="false"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include>
+
+        <arg name="x" default="0"/>
+        <arg name="y" default="0"/>
+        <arg name="z" default="0"/>   
+
+     <node name="human_spawn" pkg="gazebo_ros" type="spawn_model"  output="screen"  
+              args="-urdf -param robot_description -model mhuman -x $(arg x) -y $(arg y) -z $(arg z)" />
+ 
+    <rosparam command="load" file="$(find humansinglearm_moveit_config)/config/controllers.yaml"/>
+<!--       <param name="use_controller_manager" value="false"/>
+       <param name="trajectory_execution/execution_duration_monitoring" value="false"/> 
+       <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
+-->
+<!-- 
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> -->
+        
+        <!-- Load Controllers -->
+<!--     <rosparam command="load" file="$(find model_human)/config/joints.yaml"/>   --> 
+
+        <!-- Controllers -->
+     <node name="controller_spawner" pkg="controller_manager" type="spawner"  
+              respawn="false" output="screen" ns="/mhuman" 
+              args="--namespace=/mhuman joint_state_controller right_arm_controller right_hand_controller"/>
+     
+<!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+      <remap from="/joint_states" to="/mhuman/joint_states" />   
+     </node>
+-->
+<!--    <node name="mhuman_joint_states" pkg="moveit_ros_move_group" type="move_group" respawn="false" output="screen">
+      <remap from="/joint_states" to="mhuman/joint_states" />   
+     </node>
+-->
+
+  <!-- Load the SRDF and other configuration files -->
+  <include file="$(find humansinglearm_moveit_config)/launch/planning_context.launch">
+      <arg name="load_robot_description" value="true"/>
+  </include>
+
+  <!-- Run the main MoveIt executable -->
+  <include file="$(find humansinglearm_moveit_config)/launch/move_group.launch">
+<!--    <arg name="allow_trajectory_execution" value="true"/> -->
+    <arg name="debug" value="$(arg debug)"/>
+    <arg name="info" value="true"/>
+  </include>
+  
+
+<!--  <rosparam command="load" file="$(find humansarm_moveit_config)/config/joint_names.yaml"/>
+
+  <include file="$(find humansarm_moveit_config)/launch/planning_context.launch">
+  
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="/use_gui" value="false"/>
+    <rosparam param="/source_list">[/joint_states]</rosparam>
+  </node> 
+
+  <include file="$(find humansarm_moveit_config)/launch/move_group.launch">
+   <arg name="publish_monitored_planning_scene" value="true"/>
+  </include>
+
+  <include file="$(find humansarm_moveit_config)/launch/moveit_gazebo.launch">
+   <arg name="config" value="true"/>
+  </include>
+-->
+</launch>

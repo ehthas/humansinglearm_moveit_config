@@ -1,0 +1,30 @@
+controller_list:
+  - name: right_arm_controller
+    type: effort_controllers/JointPositionController
+    joints:
+      - jright_shoulder
+      - jright_upper_arm
+      - jright_forearm
+  - name: right_hand_controller
+    type: effort_controllers/JointPositionController
+    joints:
+      - jright_grip_rhand
+    gains:
+      jright_shoulder:
+        p: 100
+        i: 0.01
+        d: 10
+      jright_upper_arm:
+        p: 100
+        i: 0.01
+        d: 10   
+      jright_forearm:
+        p: 100
+        i: 0.01
+        d: 10      
+      jright_grip_rhand:
+        p: 100
+        i: 0.01
+        d: 10
+         
+

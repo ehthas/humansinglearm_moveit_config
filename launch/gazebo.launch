@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+  <!-- Debug mode -->
+  <arg name="debug" default="false" />
+  
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="z" default="0"/>   
+
+  <!-- Launch Gazebo -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find humansinglearm_moveit_config)/worlds/empty.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include>
+
+  <!-- Loading urdf to param server -->
+   <param name="robot_description" command="$(find xacro)/xacro '$(find model_human)/urdf/model_human.xacro'" /> 
+
+  <!-- Spawn robot in gazebo -->
+   <node name="human_spawn" pkg="gazebo_ros" type="spawn_model"  output="screen"  
+         args="-urdf -param robot_description -model mhuman -x $(arg x) -y $(arg y) -z $(arg z)" />
+
+  <include file="$(find humansinglearm_moveit_config)/launch/ros_controllers.launch"/>
+
+</launch>
+
+
